@@ -6,13 +6,17 @@ import "./App.css";
 import data from "./data.json";
 
 export default function App() {
-    const [booksWithAuthors, setBooksWithAuthors] = useState([]);
-    const [selectedBookId, setSelectedBookId] = useState(null);
+    const [books, setBooks] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
-        // Use local JSON data instead of API
-        setBooksWithAuthors(data);
+        // Transform data to include selected property and use title as author
+        const transformedData = data.map((book) => ({
+            ...book,
+            author: book.subtitle || "Unknown Author",
+            selected: false,
+        }));
+        setBooks(transformedData);
     }, []);
 
     const handleAddBook = () => {
@@ -24,22 +28,42 @@ export default function App() {
     };
 
     const handleBookSelect = (bookId) => {
-        // If clicking on the same book, deselect it
-        if (selectedBookId === bookId) {
-            setSelectedBookId(null);
-        } else {
-            setSelectedBookId(bookId);
-        }
+        setBooks((prev) =>
+            prev.map((book) => ({
+                ...book,
+                selected: book.isbn13 === bookId ? !book.selected : false,
+            }))
+        );
     };
 
-    const handleBookRemove = (bookId) => {
-        setBooksWithAuthors((prev) =>
-            prev.filter((book) => book.isbn13 !== bookId)
-        );
-        // If the removed book was selected, clear selection
-        if (selectedBookId === bookId) {
-            setSelectedBookId(null);
-        }
+    const handleDeleteSelected = () => {
+        setBooks((prev) => prev.filter((book) => !book.selected));
+    };
+
+    const handleUpdateSelected = () => {
+        // No-op for now as requested
+        console.log("Update functionality not implemented yet");
+    };
+
+    const handleAddNewBook = (newBookData) => {
+        const newBook = {
+            isbn13: Date.now().toString(), // Generate unique ID
+            title: newBookData.title,
+            author: newBookData.author,
+            subtitle: newBookData.author, // Keep subtitle for compatibility
+            publisher: newBookData.publisher || "Unknown Publisher",
+            publicationYear: newBookData.publicationYear || "Unknown",
+            language: newBookData.language || "Unknown",
+            pages: newBookData.pages || "Unknown",
+            image:
+                newBookData.imageUrl ||
+                "https://via.placeholder.com/200x300?text=No+Image",
+            url: "#", // Default URL since it's not in the form
+            price: "N/A", // Default price since it's not in the form
+            selected: false,
+            isUserAdded: true, // Mark as user-added book
+        };
+        setBooks((prev) => [...prev, newBook]);
     };
 
     return (
@@ -49,30 +73,41 @@ export default function App() {
             </header>
 
             <div className='content'>
-                {booksWithAuthors.length === 0 ? (
-                    <p>Loading…</p>
-                ) : (
-                    <div className='main-layout'>
-                        <div className='btn-plus-container'>
-                            <BtnPlus onClick={handleAddBook} />
+                <div className='main-layout'>
+                    <div className='btn-plus-container'>
+                        <BtnPlus onClick={handleAddBook} />
+                        <div className='action-buttons'>
+                            <button
+                                className='btn-update'
+                                onClick={handleUpdateSelected}
+                                title='Edit selected book'>
+                                Edit
+                            </button>
+                            <button
+                                className='btn-delete'
+                                onClick={handleDeleteSelected}
+                                title='Delete selected book'>
+                                Delete
+                            </button>
                         </div>
-                        <div className='books-grid'>
-                            {booksWithAuthors.map((b) => (
+                    </div>
+                    <div className='books-grid'>
+                        {books
+                            .filter((book) => book.isUserAdded)
+                            .map((b) => (
                                 <Book
                                     key={b.isbn13}
                                     image={b.image}
                                     title={b.title}
-                                    authors={b.subtitle}
+                                    authors={b.author}
                                     url={b.url}
                                     price={b.price}
-                                    isSelected={selectedBookId === b.isbn13}
+                                    isSelected={b.selected}
                                     onSelect={() => handleBookSelect(b.isbn13)}
-                                    onRemove={() => handleBookRemove(b.isbn13)}
                                 />
                             ))}
-                        </div>
                     </div>
-                )}
+                </div>
             </div>
 
             <footer className='footer'>
@@ -82,6 +117,7 @@ export default function App() {
             <AddBookModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
+                onAddBook={handleAddNewBook}
             />
         </div>
     );

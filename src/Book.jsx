@@ -9,27 +9,15 @@ export default function Book({
     price,
     isSelected,
     onSelect,
-    onRemove,
 }) {
     const handleBookClick = () => {
         onSelect();
-    };
-
-    const handleRemoveClick = (e) => {
-        e.stopPropagation(); // Prevent book selection when clicking remove
-        onRemove();
     };
 
     return (
         <div
             className={`book normal ${isSelected ? "selected" : ""}`}
             onClick={handleBookClick}>
-            <button
-                className='remove-btn'
-                onClick={handleRemoveClick}
-                title='Remove book'>
-                Remove
-            </button>
             <div className='image'>
                 <img
                     src={image}
@@ -37,16 +25,9 @@ export default function Book({
                 />
             </div>
             <div className='meta'>
+                <h3 className='title'>{title}</h3>
+                <p className='author'>{authors}</p>
                 {price && <p className='price'>{price}</p>}
-                <a
-                    className='learn-more-btn'
-                    href={url}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    onClick={(e) => e.stopPropagation()} // Prevent book selection when clicking link
-                >
-                    Learn More
-                </a>
             </div>
         </div>
     );

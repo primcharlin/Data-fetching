@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 
-export default function AddBookModal({ isOpen, onClose }) {
+export default function AddBookModal({ isOpen, onClose, onAddBook }) {
     const [formData, setFormData] = useState({
         title: "",
         author: "",
@@ -9,6 +9,7 @@ export default function AddBookModal({ isOpen, onClose }) {
         publicationYear: "",
         language: "",
         pages: "",
+        imageUrl: "",
     });
 
     const handleInputChange = (e) => {
@@ -21,8 +22,8 @@ export default function AddBookModal({ isOpen, onClose }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // For now, just close the modal
-        // Later we can add the book to the list
+        // Add the book to the list
+        onAddBook(formData);
         onClose();
         // Reset form
         setFormData({
@@ -32,6 +33,7 @@ export default function AddBookModal({ isOpen, onClose }) {
             publicationYear: "",
             language: "",
             pages: "",
+            imageUrl: "",
         });
     };
 
@@ -45,6 +47,7 @@ export default function AddBookModal({ isOpen, onClose }) {
             publicationYear: "",
             language: "",
             pages: "",
+            imageUrl: "",
         });
     };
 
@@ -73,7 +76,6 @@ export default function AddBookModal({ isOpen, onClose }) {
                             value={formData.title}
                             onChange={handleInputChange}
                             placeholder='book title...'
-                            required
                         />
                     </div>
 
@@ -86,7 +88,6 @@ export default function AddBookModal({ isOpen, onClose }) {
                             value={formData.author}
                             onChange={handleInputChange}
                             placeholder='Author'
-                            required
                         />
                     </div>
 
@@ -114,6 +115,7 @@ export default function AddBookModal({ isOpen, onClose }) {
                             onChange={handleInputChange}
                             min='1000'
                             max='2025'
+                            placeholder='2024'
                         />
                     </div>
 
@@ -138,6 +140,19 @@ export default function AddBookModal({ isOpen, onClose }) {
                             value={formData.pages}
                             onChange={handleInputChange}
                             min='1'
+                            placeholder='300'
+                        />
+                    </div>
+
+                    <div className='form-row'>
+                        <label htmlFor='imageUrl'>Book Cover URL</label>
+                        <input
+                            type='url'
+                            id='imageUrl'
+                            name='imageUrl'
+                            value={formData.imageUrl}
+                            onChange={handleInputChange}
+                            placeholder='https://example.com/book-cover.jpg'
                         />
                     </div>
 
