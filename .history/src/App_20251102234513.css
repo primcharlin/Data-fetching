@@ -199,18 +199,6 @@ h1 {
     background: #c0392b;
 }
 
-.loan-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.btn-quit-small {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8rem;
-}
-
 .books-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);

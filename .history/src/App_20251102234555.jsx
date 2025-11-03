@@ -133,6 +133,16 @@ export default function App() {
             <header className='app-header'>
                 <h1>Book Catalog</h1>
             </header>
+            {view === "loans" && (
+                <div className='quit-bar'>
+                    <button
+                        className='btn-update btn-quit'
+                        onClick={() => setView("catalog")}
+                        title='Quit to catalog'>
+                        Quit
+                    </button>
+                </div>
+            )}
 
             <div className='content'>
                 <div className='main-layout'>
@@ -194,7 +204,6 @@ export default function App() {
                             availableBooks={availableBooksForLoan}
                             loans={loans}
                             onCreateLoan={handleCreateLoan}
-                            onQuit={() => setView("catalog")}
                         />
                     )}
                 </div>

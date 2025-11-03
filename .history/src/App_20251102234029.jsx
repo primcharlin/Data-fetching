@@ -169,7 +169,16 @@ export default function App() {
                                 </div>
                             </>
                         )}
-                        {view === "loans" && null}
+                        {view === "loans" && (
+                            <div className='action-buttons'>
+                                <button
+                                    className='btn-update btn-quit'
+                                    onClick={() => setView("catalog")}
+                                    title='Quit to catalog'>
+                                    Quit
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {view === "catalog" ? (
@@ -194,7 +203,6 @@ export default function App() {
                             availableBooks={availableBooksForLoan}
                             loans={loans}
                             onCreateLoan={handleCreateLoan}
-                            onQuit={() => setView("catalog")}
                         />
                     )}
                 </div>

@@ -185,30 +185,11 @@ h1 {
 .quit-bar {
     display: flex;
     justify-content: flex-end;
-    padding: 0;
+    padding: 0.5rem 2rem 0 2rem;
 }
 
 .btn-quit {
     position: static;
-    background: #e74c3c;
-    color: #fff;
-    margin: 0.5rem 1rem 0 0;
-}
-
-.btn-quit:hover {
-    background: #c0392b;
-}
-
-.loan-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.btn-quit-small {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8rem;
 }
 
 .books-grid {

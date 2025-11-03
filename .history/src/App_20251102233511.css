@@ -182,35 +182,6 @@ h1 {
     transform: translateY(-1px);
 }
 
-.quit-bar {
-    display: flex;
-    justify-content: flex-end;
-    padding: 0;
-}
-
-.btn-quit {
-    position: static;
-    background: #e74c3c;
-    color: #fff;
-    margin: 0.5rem 1rem 0 0;
-}
-
-.btn-quit:hover {
-    background: #c0392b;
-}
-
-.loan-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.btn-quit-small {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8rem;
-}
-
 .books-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -662,6 +633,7 @@ h1 {
     }
 }
 
+/* Loan Management specific text colors */
 .loan-management,
 .loan-management h2,
 .loaned-books h3,
@@ -672,6 +644,7 @@ h1 {
     color: #000;
 }
 
+/* On-loan badge */
 .badge.badge-loan {
     position: absolute;
     top: 8px;

@@ -96,7 +96,7 @@ export default function App() {
     };
 
     const availableBooksForLoan = useMemo(
-        () => books.filter((b) => b.isUserAdded && !onLoanByIsbn.get(b.isbn13)),
+        () => books.filter((b) => !onLoanByIsbn.get(b.isbn13)),
         [books, onLoanByIsbn]
     );
 
@@ -149,7 +149,7 @@ export default function App() {
                                         className='btn-update'
                                         onClick={() => setView("loans")}
                                         title='Switch to loan management'>
-                                        Manage Loans
+                                        Loan Management
                                     </button>
                                 </div>
                                 <BtnPlus onClick={handleAddBook} />
@@ -169,7 +169,16 @@ export default function App() {
                                 </div>
                             </>
                         )}
-                        {view === "loans" && null}
+                        {view === "loans" && (
+                            <div className='action-buttons'>
+                                <button
+                                    className='btn-update'
+                                    onClick={() => setView("catalog")}
+                                    title='Back to catalog'>
+                                    Back to Catalog
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {view === "catalog" ? (
@@ -194,7 +203,6 @@ export default function App() {
                             availableBooks={availableBooksForLoan}
                             loans={loans}
                             onCreateLoan={handleCreateLoan}
-                            onQuit={() => setView("catalog")}
                         />
                     )}
                 </div>
