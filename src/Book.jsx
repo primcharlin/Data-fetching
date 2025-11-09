@@ -10,9 +10,17 @@ export default function Book({
     isSelected,
     onSelect,
     onLoan,
+    onViewDetails,
 }) {
     const handleBookClick = () => {
         onSelect();
+    };
+
+    const handleViewDetails = (e) => {
+        e.stopPropagation(); // Prevent book selection when clicking details button
+        if (onViewDetails) {
+            onViewDetails();
+        }
     };
 
     return (
@@ -30,6 +38,14 @@ export default function Book({
                 <h3 className='title'>{title}</h3>
                 <p className='author'>{authors}</p>
                 {price && <p className='price'>{price}</p>}
+                {onViewDetails && (
+                    <button
+                        className='view-details-btn'
+                        onClick={handleViewDetails}
+                        title='View book details'>
+                        View Details
+                    </button>
+                )}
             </div>
         </div>
     );

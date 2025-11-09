@@ -3,8 +3,8 @@ import Book from "./Book";
 import BtnPlus from "./BtnPlus";
 import AddBookModal from "./AddBookModal";
 import BookFilter from "./BookFilter";
+import BookDetails from "./BookDetails";
 import "./App.css";
-import data from "./data.json";
 import LoanManagement from "./LoanManagement";
 
 export default function App() {
@@ -15,20 +15,11 @@ export default function App() {
     });
     const [view, setView] = useState("catalog"); // catalog | loans
     const [loans, setLoans] = useState([]); // { isbn13, borrower, weeks, dueDate }
+    const [selectedBookForDetails, setSelectedBookForDetails] = useState(null);
 
     useEffect(() => {
-        // Transform data to include selected property and use title as author
-        const transformedData = data.map((book) => ({
-            ...book,
-            author: book.subtitle || "Unknown Author",
-            publisher: "Unknown Publisher",
-            publicationYear: "Unknown",
-            language: "English",
-            pages: "Unknown",
-            selected: false,
-            isUserAdded: false, // Mark as default books
-        }));
-        setBooks(transformedData);
+        // Start with empty books array - only show user-added books
+        setBooks([]);
     }, []);
 
     const handleAddBook = () => {
@@ -108,7 +99,7 @@ export default function App() {
         }));
     };
 
-    // Get unique authors from user-added books
+    // Get unique authors from user-added books only
     const uniqueAuthors = [
         ...new Set(
             books
@@ -120,13 +111,21 @@ export default function App() {
 
     // Filter books based on criteria - only show user-added books
     const filteredBooks = books.filter((book) => {
-        // Only show user-added books (hide existing/default books)
+        // Only show user-added books
         if (!book.isUserAdded) return false;
 
         const matchesAuthor =
             !filterCriteria.author || book.author === filterCriteria.author;
         return matchesAuthor;
     });
+
+    const handleViewBookDetails = (book) => {
+        setSelectedBookForDetails(book);
+    };
+
+    const handleDismissBookDetails = () => {
+        setSelectedBookForDetails(null);
+    };
 
     return (
         <div className='app'>
@@ -170,21 +169,33 @@ export default function App() {
                     )}
 
                     {view === "catalog" ? (
-                        <div className='books-grid'>
-                            {filteredBooks.map((b) => (
-                                <Book
-                                    key={b.isbn13}
-                                    image={b.image}
-                                    title={b.title}
-                                    authors={b.author}
-                                    url={b.url}
-                                    price={b.price}
-                                    isSelected={b.selected}
-                                    onSelect={() => handleBookSelect(b.isbn13)}
-                                    onLoan={onLoanByIsbn.get(b.isbn13)}
-                                />
-                            ))}
-                        </div>
+                        selectedBookForDetails ? (
+                            <BookDetails
+                                book={selectedBookForDetails}
+                                onDismiss={handleDismissBookDetails}
+                            />
+                        ) : (
+                            <div className='books-grid'>
+                                {filteredBooks.map((b) => (
+                                    <Book
+                                        key={b.isbn13}
+                                        image={b.image}
+                                        title={b.title}
+                                        authors={b.author}
+                                        url={b.url}
+                                        price={b.price}
+                                        isSelected={b.selected}
+                                        onSelect={() =>
+                                            handleBookSelect(b.isbn13)
+                                        }
+                                        onLoan={onLoanByIsbn.get(b.isbn13)}
+                                        onViewDetails={() =>
+                                            handleViewBookDetails(b)
+                                        }
+                                    />
+                                ))}
+                            </div>
+                        )
                     ) : (
                         <div className='loan-pane'>
                             <LoanManagement
