@@ -13,15 +13,32 @@ export default function BookDetails({ book, onDismiss }) {
             setLoading(true);
             setError(null);
             try {
-                // Try searching by title first
-                let query = book.title;
-                // If title is too long, use first few words
-                if (query.length > 30) {
-                    query = query.split(" ").slice(0, 3).join(" ");
+                // Extract the first significant word from the title for search
+                // This ensures the API receives a single token
+                let query = book.title.trim();
+                // Split by spaces and get the first non-empty word
+                const words = query
+                    .split(/\s+/)
+                    .filter((word) => word.length > 0);
+                if (words.length > 0) {
+                    // Use the first word, removing any special characters that might break the API
+                    query = words[0].replace(/[^\w-]/g, "");
+                } else {
+                    // Fallback: use first 10 characters if no words found
+                    query = query.substring(0, 10).replace(/[^\w-]/g, "");
+                }
+
+                // Ensure we have a valid query
+                if (!query || query.length === 0) {
+                    setSimilarBooks([]);
+                    setLoading(false);
+                    return;
                 }
 
                 const response = await fetch(
-                    `https://api.itbook.store/1.0/search/${encodeURIComponent(query)}`
+                    `https://api.itbook.store/1.0/search/${encodeURIComponent(
+                        query
+                    )}`
                 );
                 const data = await response.json();
 
@@ -70,13 +87,19 @@ export default function BookDetails({ book, onDismiss }) {
                             <h2 className='book-details-title'>{book.title}</h2>
                             <div className='book-details-meta'>
                                 <div className='book-details-row'>
-                                    <span className='book-details-label'>Author:</span>
+                                    <span className='book-details-label'>
+                                        Author:
+                                    </span>
                                     <span className='book-details-value'>
-                                        {book.author || book.subtitle || "Unknown"}
+                                        {book.author ||
+                                            book.subtitle ||
+                                            "Unknown"}
                                     </span>
                                 </div>
                                 <div className='book-details-row'>
-                                    <span className='book-details-label'>Publisher:</span>
+                                    <span className='book-details-label'>
+                                        Publisher:
+                                    </span>
                                     <span className='book-details-value'>
                                         {book.publisher || "Unknown"}
                                     </span>
@@ -90,26 +113,34 @@ export default function BookDetails({ book, onDismiss }) {
                                     </span>
                                 </div>
                                 <div className='book-details-row'>
-                                    <span className='book-details-label'>Pages:</span>
+                                    <span className='book-details-label'>
+                                        Pages:
+                                    </span>
                                     <span className='book-details-value'>
                                         {book.pages || "Unknown"}
                                     </span>
                                 </div>
                                 <div className='book-details-row'>
-                                    <span className='book-details-label'>Language:</span>
+                                    <span className='book-details-label'>
+                                        Language:
+                                    </span>
                                     <span className='book-details-value'>
                                         {book.language || "Unknown"}
                                     </span>
                                 </div>
                                 <div className='book-details-row'>
-                                    <span className='book-details-label'>Price:</span>
+                                    <span className='book-details-label'>
+                                        Price:
+                                    </span>
                                     <span className='book-details-value'>
                                         {book.price || "N/A"}
                                     </span>
                                 </div>
                                 {book.isbn13 && (
                                     <div className='book-details-row'>
-                                        <span className='book-details-label'>ISBN-13:</span>
+                                        <span className='book-details-label'>
+                                            ISBN-13:
+                                        </span>
                                         <span className='book-details-value'>
                                             {book.isbn13}
                                         </span>
@@ -122,7 +153,9 @@ export default function BookDetails({ book, onDismiss }) {
                     <div className='similar-books-section'>
                         <h3 className='similar-books-title'>Similar Books</h3>
                         {loading && (
-                            <p className='similar-books-loading'>Loading similar books...</p>
+                            <p className='similar-books-loading'>
+                                Loading similar books...
+                            </p>
                         )}
                         {error && (
                             <p className='similar-books-error'>{error}</p>
@@ -164,4 +197,3 @@ export default function BookDetails({ book, onDismiss }) {
         </div>
     );
 }
-
