@@ -10,6 +10,7 @@ import LoanManagement from "./LoanManagement";
 export default function App() {
     const [books, setBooks] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingBook, setEditingBook] = useState(null); // Book being edited, null for add mode
     const [filterCriteria, setFilterCriteria] = useState({
         author: "",
     });
@@ -17,17 +18,51 @@ export default function App() {
     const [loans, setLoans] = useState([]); // { isbn13, borrower, weeks, dueDate }
     const [selectedBookForDetails, setSelectedBookForDetails] = useState(null);
 
+    // Load data from localStorage on mount
     useEffect(() => {
-        // Start with empty books array - only show user-added books
-        setBooks([]);
+        const savedBooks = localStorage.getItem("books");
+        if (savedBooks) {
+            try {
+                const parsedBooks = JSON.parse(savedBooks);
+                setBooks(parsedBooks);
+            } catch (error) {
+                console.error("Error loading books from localStorage:", error);
+            }
+        }
+
+        const savedLoans = localStorage.getItem("loans");
+        if (savedLoans) {
+            try {
+                const parsedLoans = JSON.parse(savedLoans);
+                setLoans(parsedLoans);
+            } catch (error) {
+                console.error("Error loading loans from localStorage:", error);
+            }
+        }
     }, []);
 
+    // Save books to localStorage whenever they change
+    useEffect(() => {
+        if (books.length > 0 || localStorage.getItem("books")) {
+            localStorage.setItem("books", JSON.stringify(books));
+        }
+    }, [books]);
+
+    // Save loans to localStorage whenever they change
+    useEffect(() => {
+        if (loans.length > 0 || localStorage.getItem("loans")) {
+            localStorage.setItem("loans", JSON.stringify(loans));
+        }
+    }, [loans]);
+
     const handleAddBook = () => {
+        setEditingBook(null); // Set to add mode
         setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
+        setEditingBook(null); // Reset edit mode
     };
 
     const handleBookSelect = (bookId) => {
@@ -40,12 +75,24 @@ export default function App() {
     };
 
     const handleDeleteSelected = () => {
+        const selectedBookIds = books
+            .filter((book) => book.selected)
+            .map((book) => book.isbn13);
         setBooks((prev) => prev.filter((book) => !book.selected));
+        // Also remove any loans associated with deleted books
+        setLoans((prev) =>
+            prev.filter((loan) => !selectedBookIds.includes(loan.isbn13))
+        );
     };
 
     const handleUpdateSelected = () => {
-        // No-op for now as requested
-        console.log("Update functionality not implemented yet");
+        const selectedBook = books.find((book) => book.selected);
+        if (selectedBook) {
+            setEditingBook(selectedBook);
+            setIsModalOpen(true);
+        } else {
+            alert("Please select a book to edit");
+        }
     };
 
     const handleAddNewBook = (newBookData) => {
@@ -67,6 +114,33 @@ export default function App() {
             isUserAdded: true, // Mark as user-added book
         };
         setBooks((prev) => [...prev, newBook]);
+    };
+
+    const handleUpdateBook = (updatedBookData) => {
+        if (!editingBook) return;
+
+        setBooks((prev) =>
+            prev.map((book) =>
+                book.isbn13 === editingBook.isbn13
+                    ? {
+                          ...book,
+                          title: updatedBookData.title,
+                          author: updatedBookData.author,
+                          subtitle: updatedBookData.author,
+                          publisher:
+                              updatedBookData.publisher || "Unknown Publisher",
+                          publicationYear:
+                              updatedBookData.publicationYear || "Unknown",
+                          language: updatedBookData.language || "Unknown",
+                          pages: updatedBookData.pages || "Unknown",
+                          image:
+                              updatedBookData.imageUrl ||
+                              "https://via.placeholder.com/200x300?text=No+Image",
+                          selected: false, // Deselect after editing
+                      }
+                    : book
+            )
+        );
     };
 
     // Derived: quick lookup of on-loan status by isbn13
@@ -218,6 +292,8 @@ export default function App() {
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 onAddBook={handleAddNewBook}
+                onUpdateBook={handleUpdateBook}
+                editingBook={editingBook}
             />
         </div>
     );

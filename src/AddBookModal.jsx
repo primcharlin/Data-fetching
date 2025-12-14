@@ -1,7 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
-export default function AddBookModal({ isOpen, onClose, onAddBook }) {
+export default function AddBookModal({
+    isOpen,
+    onClose,
+    onAddBook,
+    onUpdateBook,
+    editingBook,
+}) {
     const [formData, setFormData] = useState({
         title: "",
         author: "",
@@ -11,6 +17,32 @@ export default function AddBookModal({ isOpen, onClose, onAddBook }) {
         pages: "",
         imageUrl: "",
     });
+
+    // Update form data when editingBook changes
+    useEffect(() => {
+        if (editingBook) {
+            setFormData({
+                title: editingBook.title || "",
+                author: editingBook.author || "",
+                publisher: editingBook.publisher || "",
+                publicationYear: editingBook.publicationYear || "",
+                language: editingBook.language || "",
+                pages: editingBook.pages || "",
+                imageUrl: editingBook.image || "",
+            });
+        } else {
+            // Reset form for add mode
+            setFormData({
+                title: "",
+                author: "",
+                publisher: "",
+                publicationYear: "",
+                language: "",
+                pages: "",
+                imageUrl: "",
+            });
+        }
+    }, [editingBook, isOpen]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -22,19 +54,14 @@ export default function AddBookModal({ isOpen, onClose, onAddBook }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Add the book to the list
-        onAddBook(formData);
+        if (editingBook) {
+            // Update existing book
+            onUpdateBook(formData);
+        } else {
+            // Add new book
+            onAddBook(formData);
+        }
         onClose();
-        // Reset form
-        setFormData({
-            title: "",
-            author: "",
-            publisher: "",
-            publicationYear: "",
-            language: "",
-            pages: "",
-            imageUrl: "",
-        });
     };
 
     const handleClose = () => {
@@ -61,7 +88,7 @@ export default function AddBookModal({ isOpen, onClose, onAddBook }) {
                 className='modal-content'
                 onClick={(e) => e.stopPropagation()}>
                 <div className='modal-header'>
-                    <h2>Add Book</h2>
+                    <h2>{editingBook ? "Edit Book" : "Add Book"}</h2>
                 </div>
 
                 <form
